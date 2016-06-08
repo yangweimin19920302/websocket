@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Java API for WebSocket (JSR-356)</title>
+</head>
+<body>
+<script type="text/javascript" charset="UTF-8" src="jquery-1.11.1.min.js"></script>
+<script type="text/javascript" charset="UTF-8" src="sockjs-0.3.min.js"></script>
+<script type="text/javascript">
+    var websocket = null;
+    if ('WebSocket' in window) {
+        websocket = new WebSocket("ws://localhost:8080/webSocketServer?token=335355f7-eee6-443f-b0ed-b0045fde7676");
+    }
+    else if ('MozWebSocket' in window) {
+        websocket = new MozWebSocket("ws://localhost:8080/webSocketServer");
+    }
+    else {
+        websocket = new SockJS("http://localhost:8080/sockjs/webSocketServer");
+    }
+    websocket.onopen = onOpen;
+    websocket.onmessage = onMessage;
+    websocket.onerror = onError;
+    websocket.onclose = onClose;
+
+    function onOpen(openEvt) {
+        //alert(openEvt.Data);
+    }
+
+    function onMessage(evt) {
+        alert(evt.data);
+    }
+    function onError() {}
+    function onClose() {}
+
+    function doSend() {
+        if (websocket.readyState == websocket.OPEN) {
+            var msg = document.getElementById("inputMsg").value;
+            websocket.send(msg);//调用后台handleTextMessage方法
+            alert("发送成功!");
+        } else {
+            alert("连接失败!");
+        }
+    }
+
+    function jsonp() {
+        $.ajax({
+            type: "post",
+            dataType:"json",
+            url: "login",
+            data:{
+                "id":"1"
+            },
+            success: function(data){
+                alert(data.data.dataList[0].projectName);
+            },
+            error: function(json){
+                alert('fail');
+            }
+        });
+    }
+</script>
+请输入：<textarea rows="5" cols="10" id="inputMsg" name="inputMsg"></textarea>
+<button onclick="jsonp()">发送</button>
+</body>
+</html>
